@@ -1,0 +1,26 @@
+@ECHO Off
+set CUR_YYYY=%date:~10,4%
+set CUR_MM=%date:~4,2%
+set CUR_DD=%date:~7,2%
+set CUR_HH=%time:~0,2%
+if %CUR_HH% lss 10 (set CUR_HH=0%time:~1,1%)
+set CUR_NN=%time:~3,2%
+set CUR_SS=%time:~6,2%
+set CUR_MS=%time:~9,2%
+ECHO Ending Update Service
+net stop "New World Updater"
+NET STOP NwAegisCadBrokerService
+ECHO Deleting the update files 
+del /s /q "C:\ProgramData\New World Systems\New World Updater\"
+ECHO Deleting ClientSync.old
+ECHO Moving Client Sync to clientsync-Time.old
+MOVE "C:\ProgramData\New World Systems\Aegis CAD .NET\Client Sync" "C:\ProgramData\New World Systems\Aegis CAD .NET\ClientSync-%CUR_YYYY%%CUR_MM%%CUR_DD%-%CUR_HH%%CUR_NN%%CUR_SS%.old"
+NET START NwAegisCadBrokerService
+net start "New World Updater"
+ECHO Restarting Broker Services
+ECHO Starting Update Service
+ECHO Testing for Client Sync to repopulate
+TIMEOUT /T 30 /NOBREAK
+if exist "C:\ProgramData\New World Systems\Aegis CAD .NET\Client Sync" (EXIT) else (ECHO Waiting on Client Sync) 
+TIMEOUT /T 30 /NOBREAK
+if exist "C:\ProgramData\New World Systems\Aegis CAD .NET\Client Sync" (EXIT) else (ECHO Client Sync not built)

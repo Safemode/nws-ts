@@ -1,0 +1,10 @@
+@ECHO OFF
+ECHO Ending Update Service
+net stop "New World Updater"
+ECHO Deleting the update files 
+del /s /q "C:\ProgramData\New World Systems\New World Updater\downloader\*.*"
+del /s /q "C:\ProgramData\New World Systems\New World Updater\msiCache\*.*"
+del /s /q "C:\ProgramData\New World Systems\New World Updater\registry\*.*"
+ECHO Starting Update Service
+net start "New World Updater"
+TIMEOUT /T 30

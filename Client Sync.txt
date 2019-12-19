@@ -1,0 +1,13 @@
+@ECHO off
+ECHO Deleting ClientSync.old
+NET STOP NwAegisCadBrokerService
+RMDIR /S /Q "C:\ProgramData\New World Systems\Aegis CAD .NET\ClientSync.old"
+ECHO Moving Client Sync to clientsync.old
+MOVE "C:\ProgramData\New World Systems\Aegis CAD .NET\Client Sync" "C:\ProgramData\New World Systems\Aegis CAD .NET\clientsync.old"
+ECHO Restarting Broker Services
+NET START NwAegisCadBrokerService
+ECHO Testing for Client Sync to repopulate
+TIMEOUT /T 30 /NOBREAK
+if exist "C:\ProgramData\New World Systems\Aegis CAD .NET\Client Sync" (EXIT) else (ECHO Waiting on Client Sync) 
+TIMEOUT /T 30 /NOBREAK
+if exist "C:\ProgramData\New World Systems\Aegis CAD .NET\Client Sync" (EXIT) else (ECHO Client Sync not built)
