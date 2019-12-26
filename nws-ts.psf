@@ -332,9 +332,9 @@ $buttonCADClientSync_Click={
 	$Output.AppendText("Starting New World CAD Broker Service" + "`n")
 	Start-Service NwAegisCadBrokerService
 	
-	#Wait 30 seconds to see if the Client Sync folder is recreated
-	$Output.AppendText("Waiting 30 seconds to see if Client Sync folder is recreated" + "`n")
-	Start-Sleep -Seconds 30
+	#Wait 10 seconds to see if the Client Sync folder is recreated
+	$Output.AppendText("Waiting 10 seconds to see if Client Sync folder is recreated" + "`n")
+	Start-Sleep -Seconds 10
 	
 	$testcurrentpath = Test-Path -Path $currentcadpath
 	
@@ -348,9 +348,49 @@ $buttonCADClientSync_Click={
 	}
 }
 
-$buttonFullSync_Click={
-	#TODO: Place custom script here
+$buttonFullSync_Click = {
+	#Stop New World Updater Service
+	$Output.Text = "Stopping New World Updater Service" + "`n"
+	Stop-Service NewWorldUpdaterService
 	
+	#Stop NWS Aegis CAD Broker Service
+	$Output.AppendText("Stopping New World CAD Broker Service" + "`n")
+	Stop-Service NwAegisCadBrokerService
+	
+	#Start deleting the folders and files
+	$Output.AppendText("Deleting New World Updater Folder" + "`n")
+	$nwsupdaterfolder = "C:\ProgramData\New World Systems\New World Updater"
+	Remove-Item -Path $nwsupdaterfolder -Force -Recurse
+	
+	#Get current date and time and set to string to append to file later
+	$curdate = (Get-Date).ToString('MM-dd-yyyy_hh-mm-ss_tt')
+	$currentcadpath = "C:\ProgramData\New World Systems\Aegis CAD .NET\Client Sync"
+	$Output.AppendText("Renaming Client Sync folder and appending date $curdate" + "`n")
+	#Rename folder
+	Rename-Item -Path $currentcadpath -NewName "ClientSync-$curdate.old"
+	
+	#Start New World Updater Service
+	$Output.AppendText("Starting New World Updater Service" + "`n")
+	Start-Service NewWorldUpdaterService
+	
+	#Start NWS Aegis CAD Broker Service
+	$Output.AppendText("Starting New World CAD Broker Service" + "`n")
+	Start-Service NwAegisCadBrokerService
+	
+	#Wait 10 seconds to see if the Client Sync folder is recreated
+	$Output.AppendText("Waiting 10 seconds to see if Client Sync folder is recreated" + "`n")
+	Start-Sleep -Seconds 10
+	
+	$testcurrentpath = Test-Path -Path $currentcadpath
+	
+	if ($testcurrentpath -eq $true)
+	{
+		$Output.AppendText("Client Sync folder found, script finished")
+	}
+	else
+	{
+		$Output.AppendText("Client Sync folder not found, check your connectivity to NWPS")
+	}
 }
 ]]></Code>
   <Mode>1</Mode>
